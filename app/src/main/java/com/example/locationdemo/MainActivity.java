@@ -22,17 +22,19 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.example.locationdemo.getLocationTask.FAILED;
-import static com.example.locationdemo.getLocationTask.SUCCESSFUL;
+import static com.example.locationdemo.LocationThread.FAILED;
+import static com.example.locationdemo.LocationThread.SUCCESSFUL;
 
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity {
     public static Handler threadHandler;
-    private static final int REQUEST_CODE = 10;
+    private static final int GPS_REQUEST_CODE = 10;
+    private static final int NETWORK_REQUEST_CODE = 20;
+
 
     private LocationManager locationManager;
-    private getLocationTask BGthread;
+    private LocationThread BGthread;
 
 
     @BindView(R.id.coordinates)
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         instatiateHnadler();
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        BGthread=new getLocationTask();
+        BGthread=new LocationThread();
         BGthread.start();
     }
 
@@ -72,19 +74,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        sendRequestLoc();
+        sendRequestLoc(GPS_REQUEST_CODE, LocationManager.GPS_PROVIDER);
+        sendRequestLoc(NETWORK_REQUEST_CODE, LocationManager.NETWORK_PROVIDER);
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResult) {
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == GPS_REQUEST_CODE) {
             if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
-                sendRequestLoc();
+                sendRequestLoc(GPS_REQUEST_CODE, LocationManager.GPS_PROVIDER);
+            }
+        }
+        else if(requestCode == NETWORK_REQUEST_CODE) {
+            if(grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
+                sendRequestLoc(NETWORK_REQUEST_CODE, LocationManager.NETWORK_PROVIDER);
             }
         }
 
     }
 
-    public void sendRequestLoc() {
+    public void sendRequestLoc(int REQUEST_CODE, String PROVIDER) {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this,
@@ -95,10 +103,11 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.INTERNET}, REQUEST_CODE);
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+        locationManager.requestLocationUpdates(PROVIDER,
                 5000,          // 5-second interval.
                 0,             // 0 meters.
                 BGthread.listener);
+
     }
 
     private void enableLocationSettings() {

@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 
-public class getLocationTask extends Thread {
+public class LocationThread extends Thread {
 
     public static final int SUCCESSFUL = 1;
     public static final int FAILED = 2;
@@ -30,6 +30,8 @@ public class getLocationTask extends Thread {
                 msg.obj = "Latitude" + location.getLatitude() + " Longitude " + location.getLongitude() + "\n";
                 msg.arg1 = SUCCESSFUL;
                 MainActivity.threadHandler.sendMessage(msg);
+                Log.d("onLocationChanged:", "Accuracy: " + location.getAccuracy());
+                Log.d("onLocationChanged:", "provider: " + location.getProvider());
             }
 
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -41,9 +43,5 @@ public class getLocationTask extends Thread {
             }
         };
     }
-
-
-
-
 
 }
