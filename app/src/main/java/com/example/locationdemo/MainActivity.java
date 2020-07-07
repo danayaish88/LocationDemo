@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         BGthread = new LocationThread();
         BGthread.start();
 
-        chechPermissions();
+        checkPermissions();
     }
 
     private void instatiateHnadler() {
@@ -99,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED) {
 
             locationManager.removeUpdates(BGthread.listener);
-            Log.d("TAG", "onPause: ");
         }
     }
 
@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 Toast.makeText(this,"Permission GPS not granted", Toast.LENGTH_SHORT). show();
+                enableAppSettings();
                 //TODO: ask the user to enable location permission manually
             }
 
@@ -127,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void chechPermissions() {
+    public void checkPermissions() {
         //permissions NOT granted
         if (ContextCompat.checkSelfPermission( this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -190,6 +191,13 @@ public class MainActivity extends AppCompatActivity {
     private void enableLocationSettings() {
           Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
           startActivity(settingsIntent);
+    }
+
+    private void enableAppSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.fromParts("package", getPackageName(), null));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
 
