@@ -1,4 +1,4 @@
-package com.example.locationdemo;
+package backgroundThreads;
 
 
 import android.location.Location;
@@ -10,13 +10,15 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.example.locationdemo.MainActivity;
+
 
 public class LocationThread extends Thread {
 
     public static final int SUCCESSFUL = 1;
     public static final int FAILED = 2;
 
-    LocationListener listener;
+    public LocationListener listener;
 
 
     public void run() {

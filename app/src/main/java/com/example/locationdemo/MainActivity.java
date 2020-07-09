@@ -20,16 +20,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
-import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import backgroundThreads.LocationThread;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-import static com.example.locationdemo.LocationThread.FAILED;
-import static com.example.locationdemo.LocationThread.SUCCESSFUL;
+import static backgroundThreads.LocationThread.FAILED;
+import static backgroundThreads.LocationThread.SUCCESSFUL;
 
 
 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.coordinates)
     TextView coordinatesTv;
+    @BindView(R.id.button)
+    Button btn;
 
 
     @Override
@@ -197,6 +201,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.fromParts("package", getPackageName(), null));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.button)
+    public void click(){
+        Intent intent = new Intent(this, LocationByGoogleAPI.class);
         startActivity(intent);
     }
 
