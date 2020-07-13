@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LocationByGoogleAPI">
+    tools:context="com.example.locationdemo.mainPackage.LocationByGoogleAPI">
 
     <TextView
         android:id="@+id/locationtv"

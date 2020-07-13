@@ -1,4 +1,4 @@
-package com.example.locationdemo;
+package com.example.locationdemo.mainPackage;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -20,18 +20,26 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-import backgroundThreads.LocationThread;
+import com.example.locationdemo.R;
+
+import com.example.locationdemo.backgroundThreads.LocationThread;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static backgroundThreads.LocationThread.FAILED;
-import static backgroundThreads.LocationThread.SUCCESSFUL;
+import static com.example.locationdemo.backgroundThreads.LocationThread.FAILED;
+import static com.example.locationdemo.backgroundThreads.LocationThread.SUCCESSFUL;
 
 
 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -62,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         BGthread.start();
 
         checkPermissions();
+
     }
 
     private void instatiateHnadler() {
@@ -87,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         sendRequestLoc(LocationManager.GPS_PROVIDER);
         sendRequestLoc(LocationManager.NETWORK_PROVIDER);
+        getToken();
+
     }
 
     @Override
@@ -210,5 +221,25 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void getToken() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("TAG", "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        String msg = getString(R.string.msg_token_fmt, token);
+                        Log.d("TAG", msg);
+                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
 }

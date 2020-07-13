@@ -1,4 +1,4 @@
-package backgroundThreads;
+package com.example.locationdemo.backgroundThreads;
 
 
 import android.os.Bundle;
@@ -7,7 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.locationdemo.LocationByGoogleAPI;
+import com.example.locationdemo.mainPackage.LocationByGoogleAPI;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;

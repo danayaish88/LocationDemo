@@ -1,9 +1,9 @@
-package backgroundThreads;
+package com.example.locationdemo.backgroundThreads;
 
 import android.location.Location;
 import android.os.Message;
 
-import com.example.locationdemo.LocationByGoogleAPI;
+import com.example.locationdemo.mainPackage.LocationByGoogleAPI;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 

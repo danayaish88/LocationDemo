@@ -1,4 +1,4 @@
-package com.example.locationdemo;
+package com.example.locationdemo.mainPackage;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,13 +12,14 @@ import android.os.Looper;
 import android.os.Message;
 import android.widget.TextView;
 
+import com.example.locationdemo.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import backgroundThreads.GoogleAPIThread;
-import backgroundThreads.GoogleLocationCallback;
+import com.example.locationdemo.backgroundThreads.GoogleAPIThread;
+import com.example.locationdemo.backgroundThreads.GoogleLocationCallback;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
