@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.example.locationdemo.mainPackage.MainActivity;
+import com.google.android.gms.maps.model.LatLng;
 
 
 public class LocationThread extends Thread {
@@ -29,7 +30,8 @@ public class LocationThread extends Thread {
             public void onLocationChanged(Location location) {
                 // A new location update is received.
                 Message msg = Message.obtain();
-                msg.obj = "Latitude" + location.getLatitude() + " Longitude " + location.getLongitude() + "\n";
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                msg.obj = latLng;
                 msg.arg1 = SUCCESSFUL;
                 MainActivity.threadHandler.sendMessage(msg);
                 Log.d("onLocationChanged:", "Accuracy: " + location.getAccuracy());

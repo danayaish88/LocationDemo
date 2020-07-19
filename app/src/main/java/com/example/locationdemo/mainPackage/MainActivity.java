@@ -11,6 +11,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,7 @@ import android.widget.Toast;
 import com.example.locationdemo.R;
 
 import com.example.locationdemo.backgroundThreads.LocationThread;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -44,17 +47,23 @@ import static com.example.locationdemo.backgroundThreads.LocationThread.SUCCESSF
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class MainActivity extends AppCompatActivity {
+
     public static Handler threadHandler;
     private static final int GPS_REQUEST_CODE = 10;
     private static final int NETWORK_REQUEST_CODE = 20;
+    private static final String TAG = "Main Activity";
 
-    private LocationManager locationManager;
     private LocationThread BGthread;
+    private LatLng latLng;
+    private SharedPreferences sharedPreferences;
+    private LocationManager locationManager;
 
     @BindView(R.id.coordinates)
     TextView coordinatesTv;
     @BindView(R.id.button)
     Button btn;
+    @BindView(R.id.googleMaps)
+    ImageView googleMaps;
 
 
     @Override
@@ -65,12 +74,19 @@ public class MainActivity extends AppCompatActivity {
 
         instatiateHnadler();
 
+        startLocationThread();
+
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        BGthread = new LocationThread();
-        BGthread.start();
+
+        sharedPreferences = getPreferences(Context.MODE_PRIVATE);
 
         checkPermissions();
 
+    }
+
+    private void startLocationThread() {
+        BGthread = new LocationThread();
+        BGthread.start();
     }
 
     private void instatiateHnadler() {
@@ -79,7 +95,9 @@ public class MainActivity extends AppCompatActivity {
             public void handleMessage(@NonNull Message msg) {
                 switch (msg.arg1) {
                     case SUCCESSFUL:
-                        coordinatesTv.append((String) msg.obj);
+                        latLng = (LatLng)msg.obj;
+                        Log.d(TAG, "handleMessage: long" + latLng.longitude + " lat: " + latLng.latitude + "\n");
+                        coordinatesTv.append(latLng.latitude + " , " + latLng.longitude + "\n");
                         break;
                     case FAILED:
                         enableLocationSettings();
@@ -91,13 +109,13 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
         sendRequestLoc(LocationManager.GPS_PROVIDER);
         sendRequestLoc(LocationManager.NETWORK_PROVIDER);
         getToken();
-
     }
 
     @Override
@@ -127,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this,"Permission GPS not granted", Toast.LENGTH_SHORT). show();
                 enableAppSettings();
-                //TODO: ask the user to enable location permission manually
             }
 
         } else if (requestCode == NETWORK_REQUEST_CODE) {
@@ -137,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 Toast.makeText(this,"Permission NETWORK not granted", Toast.LENGTH_SHORT). show();
-                //TODO: ask the user to enable location permission manually
             }
         }
 
@@ -216,9 +232,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.button)
-    public void click(){
-        Intent intent = new Intent(this, LocationByGoogleAPI.class);
-        startActivity(intent);
+    public void click() {
+        GoogleServicesActivity.startScreen(this);
+    }
+
+    @OnClick(R.id.googleMaps)
+    public void goToGoogleMaps() {
+        //checkPermissions();
+        if(latLng != null){
+            MapsActivity.startScreen(MainActivity.this, latLng.longitude, latLng.latitude);
+        }
     }
 
     public void getToken() {
@@ -227,19 +250,23 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
                         if (!task.isSuccessful()) {
-                            Log.w("TAG", "getInstanceId failed", task.getException());
+                            Log.w(TAG, "getInstanceId failed", task.getException());
                             return;
                         }
 
                         // Get new Instance ID token
                         String token = task.getResult().getToken();
-
-                        // Log and toast
-                        String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d("TAG", msg);
-                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                        setToken(token);
                     }
                 });
+    }
+
+    private void setToken(String token) {
+        if(token != null){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(token, null);
+            editor.apply();
+        }
     }
 
 }
